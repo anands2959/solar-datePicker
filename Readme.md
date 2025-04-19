@@ -26,6 +26,6 @@ Instead of clicking boring calendar grids, pick your date by **rotating the Eart
 ## 📦 Installation
 
 ```bash
-git clone https://github.com/your-username/solar-date-picker.git
+git clone https://github.com/your-username/solar-datePicker.git
 cd solar-date-picker
 
