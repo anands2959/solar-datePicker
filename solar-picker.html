@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Solar System Date Picker</title>
+  <style>
+    body {
+      margin: 0;
+      background: radial-gradient(circle at center, #000, #001);
+      overflow: hidden;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+    }
+
+    #solarSystem {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #sun {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 80px;
+      height: 80px;
+      background: radial-gradient(circle, #ff0, #f90);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 60px #ff0;
+    }
+
+    .orbit {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      border: 1px dashed #333;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .planet {
+      position: absolute;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    #mercury { background: gray; width: 10px; height: 10px; }
+    #venus   { background: orange; width: 15px; height: 15px; }
+    #earth   { background: blue; width: 20px; height: 20px; cursor: pointer; }
+    #mars    { background: red; width: 17px; height: 17px; }
+    #jupiter { background: gold; width: 25px; height: 25px; }
+
+    #moonOrbit {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border: 1px dotted #666;
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      margin: -20px 0 0 -20px;
+      pointer-events: none;
+    }
+
+    #moon {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: white;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    #dateDisplay {
+      position: absolute;
+      bottom: 20px;
+      width: 100%;
+      font-size: 1.2em;
+    }
+
+    .label {
+      position: absolute;
+      color: #fff;
+      font-size: 14px;
+      text-align: center;
+      transform: translate(-50%, -120%);
+      pointer-events: none;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px #000;
+    }
+
+    #confirmDOB {
+      position: absolute;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px 20px;
+      background: #0f0;
+      color: #000;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 0 10px #0f0;
+    }
+  </style>
+</head>
+<body>
+  <div id="solarSystem">
+    <div id="sun"></div>
+
+    <!-- Orbits -->
+    <div class="orbit" id="orbit-mercury" style="width: 120px; height: 120px;"></div>
+    <div class="orbit" id="orbit-venus" style="width: 180px; height: 180px;"></div>
+    <div class="orbit" id="orbit-earth" style="width: 260px; height: 260px;"></div>
+    <div class="orbit" id="orbit-mars" style="width: 320px; height: 320px;"></div>
+    <div class="orbit" id="orbit-jupiter" style="width: 400px; height: 400px;"></div>
+
+    <!-- Planets -->
+    <div id="mercury" class="planet"></div>
+    <div id="venus" class="planet"></div>
+    <div id="earth" class="planet">
+      <div id="moonOrbit">
+        <div id="moon"></div>
+      </div>
+    </div>
+    <div id="mars" class="planet"></div>
+    <div id="jupiter" class="planet"></div>
+
+    <!-- Labels -->
+    <span class="label" id="label-mercury">Mercury</span>
+    <span class="label" id="label-venus">Venus</span>
+    <span class="label" id="label-earth">Earth</span>
+    <span class="label" id="label-mars">Mars</span>
+    <span class="label" id="label-jupiter">Jupiter</span>
+
+    <!-- Date Display -->
+    <div id="dateDisplay">Date: --</div>
+
+    <!-- Confirm DOB Button -->
+    <button id="confirmDOB">Confirm DOB</button>
+  </div>
+
+  <script>
+    const planets = {
+      mercury: { angle: 0, orbit: 60, speed: 4.15 },
+      venus:   { angle: 0, orbit: 90, speed: 1.62 },
+      earth:   { angle: 0, orbit: 130, speed: 1 },
+      mars:    { angle: 0, orbit: 160, speed: 0.53 },
+      jupiter: { angle: 0, orbit: 200, speed: 0.08 },
+    };
+
+    const baseDate = new Date();
+    let currentDate = new Date(baseDate);
+    let isDragging = false;
+    let startAngle = null;
+
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+
+    function positionPlanet(name) {
+      const p = planets[name];
+      const el = document.getElementById(name);
+      const label = document.getElementById("label-" + name);
+      const x = centerX + p.orbit * Math.cos(p.angle);
+      const y = centerY + p.orbit * Math.sin(p.angle);
+      el.style.left = `${x}px`;
+      el.style.top = `${y}px`;
+      if (label) {
+        label.style.left = `${x}px`;
+        label.style.top = `${y}px`;
+      }
+    }
+
+    function updateMoon() {
+      const moonOrbit = document.getElementById("moonOrbit");
+      const moon = document.getElementById("moon");
+      const moonAngle = Date.now() / 1000;
+      const mx = 20 + 15 * Math.cos(moonAngle);
+      const my = 20 + 15 * Math.sin(moonAngle);
+      moon.style.left = `${mx}px`;
+      moon.style.top = `${my}px`;
+    }
+
+    function updateAllPlanets() {
+      for (let name in planets) {
+        positionPlanet(name);
+      }
+    }
+
+    function updateDateDisplay() {
+      document.getElementById("dateDisplay").textContent = "Date: " + currentDate.toDateString();
+    }
+
+    function getAngle(x, y) {
+      return Math.atan2(y - centerY, x - centerX);
+    }
+
+    document.getElementById("earth").addEventListener("mousedown", () => {
+      isDragging = true;
+    });
+
+    document.addEventListener("mouseup", () => {
+      isDragging = false;
+      startAngle = null;
+    });
+
+    document.addEventListener("mousemove", (e) => {
+      if (!isDragging) return;
+      const newAngle = getAngle(e.clientX, e.clientY);
+      if (startAngle !== null) {
+        let delta = newAngle - startAngle;
+
+        if (delta > Math.PI) delta -= 2 * Math.PI;
+        if (delta < -Math.PI) delta += 2 * Math.PI;
+
+        planets.earth.angle += delta;
+
+        const days = Math.round((delta / (2 * Math.PI)) * 365);
+        currentDate.setDate(currentDate.getDate() + days);
+
+        for (let name in planets) {
+          if (name !== "earth") {
+            const ratio = planets[name].speed / planets.earth.speed;
+            planets[name].angle += delta * ratio;
+          }
+        }
+      }
+      startAngle = newAngle;
+
+      updateAllPlanets();
+      updateDateDisplay();
+    });
+
+    document.getElementById("confirmDOB").addEventListener("click", () => {
+      window.opener.postMessage({
+        type: "dobSelected",
+        date: currentDate.toDateString()
+      }, window.location.origin);
+      window.close();
+    });
+
+    function animate() {
+      updateMoon();
+      requestAnimationFrame(animate);
+    }
+
+    updateAllPlanets();
+    updateDateDisplay();
+    animate();
+  </script>
+</body>
+</html>

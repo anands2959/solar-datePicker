@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Login / Signup</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #1d2b64, #f8cdda);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      color: #333;
+    }
+
+    .container {
+      background: #fff;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #1d2b64;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 12px 15px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    .dob-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 10px 0;
+    }
+
+    #dob {
+      flex-grow: 1;
+      padding: 12px;
+      font-size: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      margin-right: 10px;
+    }
+
+    #openDatePicker {
+      padding: 13px 15px;
+      background: #1d2b64;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    #openDatePicker:hover {
+      background: #16214d;
+    }
+
+    button[type="submit"] {
+      width: 100%;
+      padding: 12px;
+      background-color: #1d2b64;
+      color: white;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background-color 0.3s ease;
+    }
+
+    button[type="submit"]:hover {
+      background-color: #0e173b;
+    }
+
+    .footer {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #555;
+    }
+
+    .footer a {
+      color: #1d2b64;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Create Account</h2>
+    <form id="signupForm">
+      <input type="text" placeholder="Full Name" required />
+      <input type="email" placeholder="Email Address" required />
+      <input type="password" placeholder="Password" required />
+
+      <div class="dob-wrapper">
+        <input type="text" id="dob" placeholder="Select DOB" readonly />
+        <button type="button" id="openDatePicker">Pick</button>
+      </div>
+
+      <button type="submit">Submit</button>
+    </form>
+
+    <div class="footer">
+      Already have an account? <a href="#">Login here</a>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("openDatePicker").addEventListener("click", () => {
+      const picker = window.open("solar-picker.html", "_blank", "width=800,height=600");
+    });
+
+    window.addEventListener("message", (e) => {
+      if (e.origin !== window.location.origin) return;
+      if (e.data.type === "dobSelected") {
+        document.getElementById("dob").value = e.data.date;
+      }
+    });
+
+    document.getElementById("signupForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const dob = document.getElementById("dob").value;
+      if (!dob) {
+        alert("Please select your date of birth.");
+        return;
+      }
+      alert("Form submitted successfully!\nDOB: " + dob);
+      // Handle your form data here or send to backend
+    });
+  </script>
+</body>
+</html>
